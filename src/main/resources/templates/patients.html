@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Patients</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            margin: 4px;
+            padding: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f5f5f5;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Patients</h1>
+
+<form method="get" th:action="@{/patients}">
+
+    <input
+            type="text"
+            name="search"
+            placeholder="Name or identifier"
+            th:value="${search}"
+    >
+
+    <select name="status">
+        <option value="">All statuses</option>
+
+        <option
+                th:each="s : ${statuses}"
+                th:value="${s}"
+                th:text="${s}"
+                th:selected="${s == status}">
+        </option>
+    </select>
+
+    <select name="module">
+        <option value="">All modules</option>
+        <option value="ASSESSMENT"
+                th:selected="${module == 'ASSESSMENT'}">
+            Assessment
+        </option>
+        <option value="DIARY"
+                th:selected="${module == 'DIARY'}">
+            Diary
+        </option>
+        <option value="PROGRAMME"
+                th:selected="${module == 'PROGRAMME'}">
+            Programme
+        </option>
+    </select>
+
+    <label>
+        Invited from
+        <input
+                type="date"
+                name="invitedFrom"
+                th:value="${invitedFrom}">
+    </label>
+
+    <label>
+        Invited to
+        <input
+                type="date"
+                name="invitedTo"
+                th:value="${invitedTo}">
+    </label>
+
+    <button type="submit">Filter</button>
+
+    <a th:href="@{/patients}">Clear</a>
+
+</form>
+
+<table>
+
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Age</th>
+        <th>Hospital ID</th>
+        <th>NHS Number</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    <tr th:each="patient : ${patients.content}">
+
+        <td>
+            <a th:href="@{/patients/{id}(id=${patient.id})}"
+               th:text="${patient.givenName + ' ' + patient.familyName}">
+            </a>
+        </td>
+
+        <td th:text="${patient.status}"></td>
+
+        <td th:text="${patient.age != null ? patient.age : '-'}"></td>
+
+        <td th:text="${patient.hospitalId ?: '-'}"></td>
+
+        <td th:text="${patient.nhsNumber ?: '-'}"></td>
+
+    </tr>
+
+    </tbody>
+</table>
+
+<div class="pagination">
+
+    <a
+            th:if="${patients.hasPrevious()}"
+            th:href="@{/patients(
+                page=${patients.number - 1},
+                size=${patients.size},
+                search=${search},
+                status=${status},
+                module=${module},
+                invitedFrom=${invitedFrom},
+                invitedTo=${invitedTo},
+                sort=${sort},
+                direction=${direction}
+            )}">
+        Previous
+    </a>
+
+    <span>
+        Page
+        <span th:text="${patients.number + 1}"></span>
+        of
+        <span th:text="${patients.totalPages}"></span>
+    </span>
+
+    <a
+            th:if="${patients.hasNext()}"
+            th:href="@{/patients(
+                page=${patients.number + 1},
+                size=${patients.size},
+                search=${search},
+                status=${status},
+                module=${module},
+                invitedFrom=${invitedFrom},
+                invitedTo=${invitedTo},
+                sort=${sort},
+                direction=${direction}
+            )}">
+        Next
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.demo.patient.service;
 
 import com.demo.patient.api.ActionResponse;
 import com.demo.patient.domain.Patient;
+import com.demo.patient.exception.PatientNotFoundException;
 import com.demo.patient.repository.ActionRepository;
 import com.demo.patient.repository.PatientRepository;
 import org.springframework.data.domain.Page;
@@ -30,7 +31,7 @@ public class ActionService {
     ) {
         Patient patient = patientRepository.findByPublicId(patientId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Patient not found")
+                        new PatientNotFoundException(patientId)
                 );
 
         return actionRepository

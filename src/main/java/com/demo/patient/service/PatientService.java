@@ -4,6 +4,8 @@ import com.demo.patient.api.PatientDetailResponse;
 import com.demo.patient.api.PatientSummaryResponse;
 import com.demo.patient.domain.Patient;
 import com.demo.patient.domain.PatientStatus;
+import com.demo.patient.exception.PatientNotFoundException;
+import com.demo.patient.repository.ActionRepository;
 import com.demo.patient.repository.PatientRepository;
 import com.demo.patient.repository.PatientSpecification;
 import org.slf4j.Logger;
@@ -13,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
@@ -22,13 +26,16 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientDerivedDataService derivedDataService;
+    private final ActionRepository actionRepository;
 
     public PatientService(
             PatientRepository patientRepository,
-            PatientDerivedDataService derivedDataService
+            PatientDerivedDataService derivedDataService,
+            ActionRepository actionRepository
     ) {
         this.patientRepository = patientRepository;
         this.derivedDataService = derivedDataService;
+        this.actionRepository = actionRepository;
     }
 
     public Page<PatientSummaryResponse> searchPatients(
@@ -96,13 +103,21 @@ public class PatientService {
 
         Patient patient = patientRepository.findByPublicId(publicId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Patient not found")
+                        new PatientNotFoundException(publicId)
                 );
 
         var age = derivedDataService.calculateAge(
                 patient,
                 LocalDate.now()
         );
+
+        Map<String, Long> engagementByModule =
+                actionRepository.countActionsByModule(patient.getEntityId())
+                        .stream()
+                        .collect(Collectors.toMap(
+                                row -> (String) row[0],
+                                row -> (Long) row[1]
+                        ));
 
         return new PatientDetailResponse(
                 patient.getPublicId(),
@@ -117,7 +132,8 @@ public class PatientService {
                 derivedDataService.deriveStatus(patient),
                 patient.getWhenInvited(),
                 patient.getWhenRegistered(),
-                patient.getWhenDischarged()
+                patient.getWhenDischarged(),
+                engagementByModule
         );
     }
 }

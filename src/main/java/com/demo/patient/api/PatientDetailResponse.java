@@ -4,6 +4,7 @@ import com.demo.patient.domain.PatientStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 public record PatientDetailResponse(
@@ -19,6 +20,7 @@ public record PatientDetailResponse(
         PatientStatus status,
         LocalDateTime whenInvited,
         LocalDateTime whenRegistered,
-        LocalDateTime whenDischarged
+        LocalDateTime whenDischarged,
+        Map<String, Long> engagementByModule
 ) {
 }
