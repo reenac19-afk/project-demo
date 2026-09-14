@@ -1,5 +1,6 @@
 package com.demo.patient.service;
 
+import com.demo.patient.api.PatientDetailResponse;
 import com.demo.patient.api.PatientSummaryResponse;
 import com.demo.patient.domain.Patient;
 import com.demo.patient.domain.PatientStatus;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class PatientService {
@@ -87,6 +89,35 @@ public class PatientService {
                 derivedDataService.deriveStatus(patient),
                 patient.getHospitalId(),
                 patient.getNhsNumber()
+        );
+    }
+
+    public PatientDetailResponse getPatient(UUID publicId) {
+
+        Patient patient = patientRepository.findByPublicId(publicId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Patient not found")
+                );
+
+        var age = derivedDataService.calculateAge(
+                patient,
+                LocalDate.now()
+        );
+
+        return new PatientDetailResponse(
+                patient.getPublicId(),
+                patient.getGivenName(),
+                patient.getFamilyName(),
+                patient.getTitle(),
+                patient.getGender(),
+                patient.getDateOfBirth(),
+                age.isPresent() ? age.getAsInt() : null,
+                patient.getHospitalId(),
+                patient.getNhsNumber(),
+                derivedDataService.deriveStatus(patient),
+                patient.getWhenInvited(),
+                patient.getWhenRegistered(),
+                patient.getWhenDischarged()
         );
     }
 }

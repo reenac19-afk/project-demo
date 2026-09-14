@@ -31,3 +31,45 @@ PostgreSQL 16 installed in the default Windows location:
 
 I verified the import by running it twice and confirming that the database
 contained 100 Patients and 3,183 Actions after both runs.
+
+## Implementation notes
+
+### Patient status
+
+Status is derived from the lifecycle timestamps and is mutually exclusive:
+
+* `DISCHARGED` – discharge timestamp present
+* `REGISTERED` – registration present and not discharged
+* `INVITED` – otherwise
+
+Verified against the supplied data: **3 Invited, 80 Registered, 17 Discharged**.
+
+One patient is discharged without a registration timestamp. Discharge takes precedence, so the patient is classified as Discharged.
+
+### Patient API
+
+Patient search uses JPA Specifications for composable server-side filtering, pagination and sorting. Search covers name, NHS number and hospital ID. Filters currently include status, action module and invitation date.
+
+DTOs are returned instead of JPA entities to avoid exposing internal persistence fields. Patient URLs use the public UUID rather than `entity_id`.
+
+Tested locally with:
+
+```text
+GET /api/patients?page=0&size=10
+GET /api/patients?search=Eddie&page=0&size=10
+GET /api/patients?status=DISCHARGED
+GET /api/patients?status=REGISTERED
+GET /api/patients?status=INVITED
+GET /api/patients?module=ASSESSMENT
+GET /api/patients?status=REGISTERED&module=PROGRAMME&page=0&size=10
+GET /api/patients/{uuid}
+GET /api/patients/{uuid}/actions?page=0&size=10&sort=whenRecorded,asc
+```
+
+### Logging
+
+Search requests log pagination, sorting, supplied-filter flags and result counts. Search text and patient identifiers are not logged.
+
+### AI verification
+
+An initial AI-assisted review of the supplied data incorrectly identified **79 Registered** and **4 Invited** patients. Testing the API in Postman returned **80 Registered** and **3 Invited**, so I checked the data directly in PostgreSQL and confirmed the API results were correct.
