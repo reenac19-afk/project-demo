@@ -1,3 +1,28 @@
+# Patient Demo
+
+Spring Boot application for viewing and searching the supplied fake patient and action data.
+
+The application provides a JSON API and Thymeleaf browser views backed by PostgreSQL.
+
+## Technology
+
+* Java 21
+* Spring Boot
+* Maven
+* PostgreSQL 16
+* Spring Data JPA
+* Flyway
+* Thymeleaf
+
+## Running locally
+
+### Prerequisites
+
+* Java 21
+* Maven, or use the included Maven wrapper
+* PostgreSQL 16
+* `psql`
+
 ## Data assumptions and inconsistencies
 I found one patient in the supplied data who has a discharge date but no registration date. 
 I therefore did not assume that the lifecycle dates would always be complete.

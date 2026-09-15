@@ -12,4 +12,10 @@ public interface PatientRepository
         JpaSpecificationExecutor<Patient> {
 
     Optional<Patient> findByPublicId(UUID publicId);
+
+    long countByWhenDischargedIsNotNull();
+
+    long countByWhenDischargedIsNullAndWhenRegisteredIsNotNull();
+
+    long countByWhenDischargedIsNullAndWhenRegisteredIsNull();
 }

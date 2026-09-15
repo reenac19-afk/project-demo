@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+</head>
+
+<body>
+
+<h1>Patient Dashboard</h1>
+
+<div>
+    <h2>Total Patients</h2>
+    <p th:text="${dashboard.total}">0</p>
+</div>
+
+<div>
+    <h2>Registered</h2>
+    <p th:text="${dashboard.registered}">0</p>
+</div>
+
+<div>
+    <h2>Invited</h2>
+    <p th:text="${dashboard.invited}">0</p>
+</div>
+
+<div>
+    <h2>Discharged</h2>
+    <p th:text="${dashboard.discharged}">0</p>
+</div>
+
+</body>
+</html>

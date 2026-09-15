@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Patients</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 30px;
+        }
+
+        nav {
+            margin-bottom: 25px;
+        }
+
+        nav a {
+            margin-right: 15px;
         }
 
         form {
@@ -45,22 +54,24 @@
 
 <body>
 
+<nav>
+    <a th:href="@{/dashboard}">Dashboard</a>
+    <a th:href="@{/patients}">Patients</a>
+</nav>
+
 <h1>Patients</h1>
 
 <form method="get" th:action="@{/patients}">
 
-    <input
-            type="text"
-            name="search"
-            placeholder="Name or identifier"
-            th:value="${search}"
-    >
+    <input type="text"
+           name="search"
+           placeholder="Name or identifier"
+           th:value="${search}">
 
     <select name="status">
         <option value="">All statuses</option>
 
-        <option
-                th:each="s : ${statuses}"
+        <option th:each="s : ${statuses}"
                 th:value="${s}"
                 th:text="${s}"
                 th:selected="${s == status}">
@@ -69,14 +80,17 @@
 
     <select name="module">
         <option value="">All modules</option>
+
         <option value="ASSESSMENT"
                 th:selected="${module == 'ASSESSMENT'}">
             Assessment
         </option>
+
         <option value="DIARY"
                 th:selected="${module == 'DIARY'}">
             Diary
         </option>
+
         <option value="PROGRAMME"
                 th:selected="${module == 'PROGRAMME'}">
             Programme
@@ -85,28 +99,29 @@
 
     <label>
         Invited from
-        <input
-                type="date"
-                name="invitedFrom"
-                th:value="${invitedFrom}">
+        <input type="date"
+               name="invitedFrom"
+               th:value="${invitedFrom}">
     </label>
 
     <label>
         Invited to
-        <input
-                type="date"
-                name="invitedTo"
-                th:value="${invitedTo}">
+        <input type="date"
+               name="invitedTo"
+               th:value="${invitedTo}">
     </label>
 
     <button type="submit">Filter</button>
 
     <a th:href="@{/patients}">Clear</a>
-
 </form>
 
-<table>
+<p>
+    <strong>Total results:</strong>
+    <span th:text="${patients.totalElements}"></span>
+</p>
 
+<table>
     <thead>
     <tr>
         <th>Name</th>
@@ -120,7 +135,6 @@
     <tbody>
 
     <tr th:each="patient : ${patients.content}">
-
         <td>
             <a th:href="@{/patients/{id}(id=${patient.id})}"
                th:text="${patient.givenName + ' ' + patient.familyName}">
@@ -131,10 +145,13 @@
 
         <td th:text="${patient.age != null ? patient.age : '-'}"></td>
 
-        <td th:text="${patient.hospitalId ?: '-'}"></td>
+        <td th:text="${patient.hospitalId != null ? patient.hospitalId : '-'}"></td>
 
-        <td th:text="${patient.nhsNumber ?: '-'}"></td>
+        <td th:text="${patient.nhsNumber != null ? patient.nhsNumber : '-'}"></td>
+    </tr>
 
+    <tr th:if="${patients.empty}">
+        <td colspan="5">No patients found</td>
     </tr>
 
     </tbody>
@@ -142,42 +159,40 @@
 
 <div class="pagination">
 
-    <a
-            th:if="${patients.hasPrevious()}"
-            th:href="@{/patients(
-                page=${patients.number - 1},
-                size=${patients.size},
-                search=${search},
-                status=${status},
-                module=${module},
-                invitedFrom=${invitedFrom},
-                invitedTo=${invitedTo},
-                sort=${sort},
-                direction=${direction}
-            )}">
+    <a th:if="${patients.hasPrevious()}"
+       th:href="@{/patients(
+            page=${patients.number - 1},
+            size=${patients.size},
+            search=${search},
+            status=${status},
+            module=${module},
+            invitedFrom=${invitedFrom},
+            invitedTo=${invitedTo},
+            sort=${sort},
+            direction=${direction}
+       )}">
         Previous
     </a>
 
-    <span>
+    <span th:if="${patients.totalPages > 0}">
         Page
         <span th:text="${patients.number + 1}"></span>
         of
         <span th:text="${patients.totalPages}"></span>
     </span>
 
-    <a
-            th:if="${patients.hasNext()}"
-            th:href="@{/patients(
-                page=${patients.number + 1},
-                size=${patients.size},
-                search=${search},
-                status=${status},
-                module=${module},
-                invitedFrom=${invitedFrom},
-                invitedTo=${invitedTo},
-                sort=${sort},
-                direction=${direction}
-            )}">
+    <a th:if="${patients.hasNext()}"
+       th:href="@{/patients(
+            page=${patients.number + 1},
+            size=${patients.size},
+            search=${search},
+            status=${status},
+            module=${module},
+            invitedFrom=${invitedFrom},
+            invitedTo=${invitedTo},
+            sort=${sort},
+            direction=${direction}
+       )}">
         Next
     </a>
 
