@@ -91,6 +91,31 @@ GET /api/patients/{uuid}
 GET /api/patients/{uuid}/actions?page=0&size=10&sort=whenRecorded,asc
 ```
 
+### Testing
+
+Unit tests cover the derived Patient status and age logic, including:
+
+* invited patients
+* registered patients
+* discharged patients
+* discharge without registration
+* birthdays before and after the reference date
+* missing date of birth
+* future date of birth
+* REST API controllers
+* Thymeleaf view controllers
+
+JUnit 5 and Mockito are used for unit testing. These tests use mocked dependencies where appropriate and do not require a running PostgreSQL database.
+
+Run the unit tests without the PostgreSQL integration test:
+
+```powershell
+.\mvnw test -Dtest='!PatientApiIntegrationTest'
+```
+PatientApiIntegrationTest provides integration testing against a real PostgreSQL database using Testcontainers.
+
+This test requires Docker to be installed and running.
+
 ### Logging
 
 Search requests log pagination, sorting, supplied-filter flags and result counts. Search text and patient identifiers are not logged.
