@@ -2,6 +2,8 @@
 
 Spring Boot application for viewing and searching the supplied fake patient and action data.
 
+This submission implements the AI-assisted task from the assessment.
+
 The application provides a JSON API and Thymeleaf browser views backed by PostgreSQL.
 
 ## Technology
